@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="css.css">
+    <script src="../libs/jquery.js"></script>
+    <script src="../libs/jSignature.min.js"></script>
+</head>
+<body>
+        <div id="signature"></div>
+        <div class="btn-box">
+            <input type="button" value="保存" id="yes"/>
+            <input type="button" value="下载" id="download"/>
+            <input type="button" value="重写" id="reset"/>
+        </div>
+        <div id="someelement"></div>
+        <script src="../libs/jquery.js"></script>
+        <!--[if lt IE 9]>
+            <script src="jSignature/flashcanvas.js"></script>
+        <![endif]-->
+        <script src="../libs/jSignature.min.js"></script>
+        <script>
+            $(function() {
+                // 1.
+                var $sigdiv = $("#signature");
+                $sigdiv.jSignature(); // 初始化jSignature插件.
+                // 2.重置画布
+                $sigdiv.jSignature("reset"); 
+                
+                $("#yes").click(function(){
+                    //将画布内容转换为图片
+                    var datapair = $sigdiv.jSignature("getData", "image");
+                    var i = new Image();
+                    i.src = "data:" + datapair[0] + "," + datapair[1];
+                    $('#someelement').show();
+                    $(i).appendTo($("#someelement")); // append the image (SVG) to DOM.
+                });
+                //datapair = $sigdiv.jSignature("getData","base30");
+                //$sigdiv.jSignature("setData", "data:" + datapair.join(","));
+                $("#download").click(function(){
+                    downloadFile("a.png", convertBase64UrlToBlob($("img").attr("src")));
+                });
+                $("#reset").click(function(){
+                    $sigdiv.jSignature("reset"); //重置画布，可以进行重新作画.
+                    $("#someelement").html("");
+                });
+
+                var canvas=document.querySelector(".jSignature");
+                canvas.width=window.innerWidth;
+                canvas.height=window.innerHeight;
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0,0,canvas.width,canvas.height)
+                $('.jSignature').width(window.innerWidth);
+                $('.jSignature').height(window.innerHeight);
+
+            });
+            function downloadFile(fileName, blob){
+                var aLink = document.createElement('a');
+                var evt = document.createEvent("HTMLEvents");
+                evt.initEvent("click", false, false);//initEvent 不加后两个参数在FF下会报错, 感谢 Barret Lee 的反馈
+                aLink.download = fileName;
+                aLink.href = URL.createObjectURL(blob);
+                aLink.dispatchEvent(evt);
+            }
+            /**
+             * 将以base64的图片url数据转换为Blob
+             * @param urlData
+             *            用url方式表示的base64图片数据
+             */
+            function convertBase64UrlToBlob(urlData){
+                 
+                var bytes=window.atob(urlData.split(',')[1]);        //去掉url的头，并转换为byte
+                 
+                //处理异常,将ascii码小于0的转换为大于0
+                var ab = new ArrayBuffer(bytes.length);
+                var ia = new Uint8Array(ab);
+                for (var i = 0; i < bytes.length; i++) {
+                    ia[i] = bytes.charCodeAt(i);
+                }
+     
+                return new Blob( [ab] , {type : 'image/png'});
+            }
+        </script>
+     
+    </body>
+</html>
