@@ -715,7 +715,6 @@ function conditionallyLinkCanvasResizeToWindowResize(jSignatureInstance, setting
 
 
 function jSignatureClass(parent, options, instanceExtensions) {
-	console.log(options)
 	var $parent = this.$parent = $(parent)
 	, eventTokens = this.eventTokens = {}
 	, events = this.events = new PubSubClass(this)
@@ -739,7 +738,6 @@ function jSignatureClass(parent, options, instanceExtensions) {
 		$.extend(settings, options)
 	}
 	this.settings = settings
-	console.log(this.settings)
 	for (var extensionName in instanceExtensions){
 		if (instanceExtensions.hasOwnProperty(extensionName)) {
 			instanceExtensions[extensionName].call(this, extensionName)
@@ -965,7 +963,6 @@ jSignatureClass.prototype.resetCanvas = function(data){
 	var lineoffset = Math.round( ch / 5 )
 	basicLine(ctx, lineoffset * 1.5, ch - lineoffset, cw - (lineoffset * 1.5), ch - lineoffset)
 	ctx.strokeStyle = settings.color;
-	console.log(settings.color)
 	if (!isCanvasEmulator){
 		ctx.shadowColor = ctx.strokeStyle
 		ctx.shadowOffsetX = ctx.lineWidth * 0.5

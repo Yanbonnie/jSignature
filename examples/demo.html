@@ -6,17 +6,17 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
     <link rel="stylesheet" href="css.css">
-    <script src="../libs/jquery.js"></script>
-    <script src="../libs/jSignature.min.js"></script>
+    <!-- <script src="../libs/jquery.js"></script>
+    <script src="../libs/jSignature.min.js"></script> -->
 </head>
 <body>
         <div id="signature"></div>
-        <div class="btn-box">
+        <div class="btn-box" id="btn-box">
             <input type="button" value="保存" id="save"/>
             <input type="button" value="下载" id="download"/>
             <input type="button" value="重写" id="reset"/>
-            <input type="button" value="黑色" id="blackColor">
-            <input type="button" value="蓝色" id="blueColor">
+            <a  id="blackColor" data-val="black" class="active">黑色</a>
+            <a  id="blueColor" data-val="blue">蓝色</a>
         </div>
         <div id="someelement"></div>
         <script src="../libs/jquery.js"></script>
@@ -26,6 +26,9 @@
         <script src="../src/jSignature.js"></script>
         <script>
             $(function() {
+                
+
+
                 var canvas = null,
                 ctx = null,
                 w = null,
@@ -33,26 +36,30 @@
                 color = null;
                 // 1.
                 var $sigdiv = $("#signature");
+                  
                 // $sigdiv.jSignature({color:"#f00",lineWidth:'5'}); // 初始化jSignature插件.  设置颜色()
                 $sigdiv.jSignature('init',
                     {
                         color:"#000",
-                        lineWidth:'5',
+                        lineWidth:'3',
                         width:window.innerWidth,
                         height:window.innerHeight
                     }
                 )
-
                 // 2.重置画布
                 $sigdiv.jSignature("reset"); 
                 
                 //3.获取画布
                 canvas=document.querySelector(".jSignature");
+                
+                // 设置画布背景色
+                ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0,0,canvas.width,canvas.height);
 
-                // $sigdiv.jSignature("setColor",'#f00'); 
                 //4.设置画布宽高
                 // resizeCanvas();
-                /*window.addEventListener("resize", resizeCanvas, false);
+                window.addEventListener("resize", resizeCanvas, false);
                 function resizeCanvas() {
                     w = window.innerWidth;
                     h = window.innerHeight;
@@ -60,32 +67,31 @@
                     canvas.height=h;
                     $('.jSignature').width(window.innerWidth);
                     $('.jSignature').height(window.innerHeight);
-                }*/
-
-                /*设置画布背景色*/
-                ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(0,0,canvas.width,canvas.height);
+                    $sigdiv.jSignature("setLineWidth",'4'); 
+                    // ctx.clearRect(0,0,window.innerWidth,window.innerHeight);  //清除画布
+                }
 
                 
                 
-
-                //5.设置颜色
-                $('#blackColor').on('click',function(){
-                    color = "#000";
+                $('#btn-box a').on('click',function(){
+                    var val = $(this).attr('data-val');
+                    $(this).addClass('active');
+                    $(this).siblings('a').removeClass('active');
+                    if(val == 'black'){
+                        color = '#000';
+                    }else{
+                        color = '#0030ff';
+                    }
                     $sigdiv.jSignature("setColor",color); 
-                    $sigdiv.jSignature("setLineWidth",'8'); 
-                })
-                //5.设置颜色
-                $('#blueColor').on('click',function(){
-                    color = "#0030ff";
-                    $sigdiv.jSignature("setColor",color); 
-                    $sigdiv.jSignature("setLineWidth",'8'); 
-                    // console.log($sigdiv.jSignature('getSettings'))
+                    $sigdiv.jSignature("setLineWidth",'4'); 
                 })
 
                 $("#save").click(function(){
                     // console.log($sigdiv.jSignature('getData','native').length)  //获取画版有无数据
+                    if($sigdiv.jSignature('getData','native').length == 0){
+                        alert("请写入您的签名");
+                        return;
+                    }
                     // return false;
                     //将画布内容转换为图片
                     var datapair = $sigdiv.jSignature("getData", "image");
@@ -94,15 +100,21 @@
                     $('#someelement').show();
                     $(i).appendTo($("#someelement")); // append the image (SVG) to DOM.
                 });
-                //datapair = $sigdiv.jSignature("getData","base30");
-                //$sigdiv.jSignature("setData", "data:" + datapair.join(","));
+
                 $("#download").click(function(){
-                    downloadFile("a.png", convertBase64UrlToBlob($("img").attr("src")));
+                    if($sigdiv.jSignature('getData','native').length == 0){
+                        alert("请先保存图片");
+                        return;
+                    }
+                    downloadFile("a.png", convertBase64UrlToBlob($("img").attr("src"))); 
                 });
+                
                 $("#reset").click(function(){
                     $sigdiv.jSignature("reset"); //重置画布，可以进行重新作画.
                     ctx.clearRect(0,0,window.innerWidth,window.innerHeight);  //清除画布
-                    $("#someelement").html("").hide();;
+                    $("#someelement").html("").hide();
+                    $sigdiv.jSignature("setColor",color); 
+                    $sigdiv.jSignature("setLineWidth",'4'); 
                 });
 
                 $("#reset").click();  //进入页面清除画布
