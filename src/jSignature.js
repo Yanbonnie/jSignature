@@ -715,7 +715,7 @@ function conditionallyLinkCanvasResizeToWindowResize(jSignatureInstance, setting
 
 
 function jSignatureClass(parent, options, instanceExtensions) {
-
+	console.log(options)
 	var $parent = this.$parent = $(parent)
 	, eventTokens = this.eventTokens = {}
 	, events = this.events = new PubSubClass(this)
@@ -734,11 +734,12 @@ function jSignatureClass(parent, options, instanceExtensions) {
 	}
 	
 	$.extend(settings, getColors($parent))
+	
 	if (options) {
 		$.extend(settings, options)
 	}
 	this.settings = settings
-
+	console.log(this.settings)
 	for (var extensionName in instanceExtensions){
 		if (instanceExtensions.hasOwnProperty(extensionName)) {
 			instanceExtensions[extensionName].call(this, extensionName)
@@ -921,7 +922,6 @@ function jSignatureClass(parent, options, instanceExtensions) {
 	
 	// end of event handlers.
 	// ===============================
-
 	this.resetCanvas(settings.data)
 
 	// resetCanvas renders the data on the screen and fires ONE "change" event
@@ -944,7 +944,6 @@ jSignatureClass.prototype.resetCanvas = function(data){
 
 	, cw = canvas.width
 	, ch = canvas.height
-	
 	// preparing colors, drawing area
 
 	ctx.clearRect(0, 0, cw + 30, ch + 30)
@@ -965,8 +964,8 @@ jSignatureClass.prototype.resetCanvas = function(data){
 	ctx.shadowOffsetY = 0
 	var lineoffset = Math.round( ch / 5 )
 	basicLine(ctx, lineoffset * 1.5, ch - lineoffset, cw - (lineoffset * 1.5), ch - lineoffset)
-	ctx.strokeStyle = settings.color
-
+	ctx.strokeStyle = settings.color;
+	console.log(settings.color)
 	if (!isCanvasEmulator){
 		ctx.shadowColor = ctx.strokeStyle
 		ctx.shadowOffsetX = ctx.lineWidth * 0.5
@@ -1371,6 +1370,27 @@ var GlobalJSignatureObjectInitializer = function(window){
 			return this.find('canvas.'+apinamespace)
 					.add(this.filter('canvas.'+apinamespace))
 					.data(apinamespace+'.this').events
+		},
+		'setColor' : function(color) {
+			// 获取 context 对象
+			var context2D = this.find('canvas.'+apinamespace)
+							.add(this.filter('canvas.'+apinamespace))
+							.data(apinamespace+'.this').canvasContext;
+			//设置阴影的颜色
+			context2D.shadowColor = 'transparent' 
+			//设置笔触颜色
+			context2D.strokeStyle = color;
+			return 
+		},
+		'setLineWidth':function(lineWidth){
+			var context2D = this.find('canvas.'+apinamespace)
+							.add(this.filter('canvas.'+apinamespace))
+							.data(apinamespace+'.this').canvasContext;
+				//设置阴影的颜色
+				context2D.shadowColor = 'transparent' 
+				//设置笔触颜色
+				context2D.lineWidth = lineWidth;
+				return 
 		}
 	} // end of methods declaration.
 	
