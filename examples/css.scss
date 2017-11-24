@@ -11,47 +11,20 @@
     background: #fff;
     width: 100%;
     height: 100%;
-    color: #f00;
     position: relative;
 }
-/*@media screen and (orientation: portrait) {  
-    html{  
-       width : 100% ;  
-       height : 100% ;  
-        background-color: white ;  
-        overflow : hidden;  
-    }  
-    body{  
-        width : 100% ;  
-       height : 100% ;  
-       background-color: red ;  
-        overflow : hidden;  
-    }  
-    #signature,.jSignature{  
-       position : absolute ;  
-       background-color: yellow ;  
-    }  
+.sweetModel{
+    width: 100%;
+    height: 100%;
+}
+@media screen and (orientation: portrait) {  
+    display: block;
+    
 }   
 @media screen and (orientation: landscape) {  
-     html{  
-       width : 100% ;  
-       height : 100% ;  
-       background-color: white ;  
-    }   
-     body{  
-        width : 100% ;  
-       height : 100% ;  
-       background-color: white ;  
-    }  
-    #signature,.jSignature{  
-          position : absolute ;  
-          top : 0 ;   
-          left : 0 ;  
-          width : 100% ;  
-          height : 100% ;  
-          background-color: yellow ;  
-    }  
-}  */
+    display: none;
+      
+}  
 #someelement{
     width: 100%;
     height: 100%;
@@ -83,3 +56,9 @@
         }
     }
 }
+
+/*友情提示*/
+.sweetCover{width: 100%;height: 100%;overflow: hidden;background: #000000;position: absolute;top: 0;left: 0;display: none;}
+.sweetCover .sweetBox{position: absolute;top: 50%;left: 50%;transform: translate(-50%,-50%);-webkit-transform: translate(-50%,-50%);width: 100%;}
+.sweetCover .sweet{width: 10rem;margin: 0 auto;display: block;}
+.sweetCover .sweetBox p{font-size: 1.2rem;color:#ffff00;text-align: center;padding-top:2.5rem;}
