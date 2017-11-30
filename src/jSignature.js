@@ -419,7 +419,7 @@ function DataEngine(storageObject, context, startStrokeFn, addToStrokeFn, endStr
 			setTimeout(
 				// some IE's don't support passing args per setTimeout API. Have to create closure every time instead.
 				function() {fn.call(context, stroke, positionInStroke)}
-				, 3
+				, 3  /*3*/
 			)
 			return point
 		} else {
@@ -855,6 +855,7 @@ function jSignatureClass(parent, options, instanceExtensions) {
 		, $canvas = $(canvas)
 		, undef
 		if (this.isCanvasEmulator){
+			alert(123)
 			$canvas.bind('mousemove.'+apinamespace, drawMoveHandler)
 			$canvas.bind('mouseup.'+apinamespace, drawEndHandler)
 			$canvas.bind('mousedown.'+apinamespace, drawStartHandler)
@@ -876,6 +877,7 @@ function jSignatureClass(parent, options, instanceExtensions) {
 				canvas.ontouchmove = drawMoveHandler
 			}*/
 			canvas.addEventListener('touchstart', function(e) {
+				//alert(456)
 				canvas.onmousedown = undef
 				canvas.onmouseup = undef
 				canvas.onmousemove = undef
@@ -887,15 +889,21 @@ function jSignatureClass(parent, options, instanceExtensions) {
 
 				drawStartHandler(e)
 
-				canvas.ontouchend = drawEndHandler
+				/*canvas.ontouchend = drawEndHandler
 				canvas.ontouchstart = drawStartHandler
-				canvas.ontouchmove = drawMoveHandler
+				canvas.ontouchmove = drawMoveHandler*/
+				canvas.addEventListener('touchend',drawEndHandler)
+				canvas.addEventListener('touchstart',drawStartHandler)
+				canvas.addEventListener('touchmove',drawMoveHandler)
 			});
 			canvas.onmousedown = function(e) {
-				canvas.ontouchstart = undef
+				console.log(789)
+				/*canvas.ontouchstart = undef
 				canvas.ontouchend = undef
-				canvas.ontouchmove = undef
-
+				canvas.ontouchmove = undef*/
+				canvas.removeEventListener('touchstart',drawStartHandler)
+				canvas.removeEventListener('touchend',drawEndHandler)
+				canvas.removeEventListener('touchmove',drawMoveHandler)
 				drawStartHandler(e)
 
 				canvas.onmousedown = drawStartHandler
@@ -1019,6 +1027,7 @@ jSignatureClass.prototype.resetCanvas = function(data){
 }
 
 function initializeCanvasEmulator(canvas){
+	console.log(1223)
 	if (canvas.getContext){
 		return false
 	} else {
@@ -1027,7 +1036,7 @@ function initializeCanvasEmulator(canvas){
 		// 'window' and 'FlashCanvas' may be stuck behind
 		// in that other parent window.
 		// we need to find it
-		var window = canvas.ownerDocument.parentWindow
+		var window = canvas.ownerDocument.parentWindow;
 		var FC = window.FlashCanvas ?
 			canvas.ownerDocument.parentWindow.FlashCanvas :
 			(
@@ -1036,8 +1045,9 @@ function initializeCanvasEmulator(canvas){
 				FlashCanvas
 			)
 
+		console.log(FC)
 		if (FC) {
-			canvas = FC.initElement(canvas)
+			//canvas = FC.initElement(canvas)
 			
 			var zoom = 1
 			// FlashCanvas uses flash which has this annoying habit of NOT scaling with page zoom. 
@@ -1053,10 +1063,10 @@ function initializeCanvasEmulator(canvas){
 					$(canvas).children('object').get(0).resize(Math.ceil(canvas.width * zoom), Math.ceil(canvas.height * zoom))
 					// And by applying "scale" transformation we can talk "browser pixels" to FlashCanvas
 					// and have it translate the "browser pixels" to "screen pixels"
-					canvas.getContext('2d').scale(zoom, zoom)
+					canvas.getContext('2d').scale(1, 1)
 					// Note to self: don't reuse Canvas element. Repeated "scale" are cumulative.
 				} catch (ex) {}
-			}
+			}			
 			return true
 		} else {
 			throw new Error("Canvas element does not support 2d context. jSignature cannot proceed.")
@@ -1066,6 +1076,7 @@ function initializeCanvasEmulator(canvas){
 }
 
 jSignatureClass.prototype.initializeCanvas = function(settings) {
+	console.log(settings)
 	// ===========
 	// Init + Sizing code
 
@@ -1093,7 +1104,17 @@ jSignatureClass.prototype.initializeCanvas = function(settings) {
 		'width'
 		, settings.width === 'ratio' || !settings.width ? 1 : settings.width.toString(10)
 	)
-
+	
+	/*if (devicePixelRatio) {
+	    canvas.style.width = `${width}px`;
+	    canvas.style.height = `${height}px`;
+	    canvas.height = height * devicePixelRatio;
+	    canvas.width = width * devicePixelRatio;
+	    context.scale(devicePixelRatio, devicePixelRatio);
+	  } else {
+	    canvas.width = width;
+	    canvas.height = height;
+	  }*/
 	$canvas.appendTo(this.$parent)
 
 	// we could not do this until canvas is rendered (appended to DOM)
@@ -1114,13 +1135,15 @@ jSignatureClass.prototype.initializeCanvas = function(settings) {
 	// canvas's drawing area resolution is independent from canvas's size.
 	// pixels are just scaled up or down when internal resolution does not
 	// match external size. So...
-
 	canvas.width = $canvas.width()
 	canvas.height = $canvas.height()
-	
+	var devicePixelRatio = window.devicePixelRatio;
+	// alert(devicePixelRatio)
+	var context = canvas.getContext('2d');
+	context.scale(devicePixelRatio, devicePixelRatio);
 	// Special case Sizing code
 
-	this.isCanvasEmulator = initializeCanvasEmulator(canvas)
+	// this.isCanvasEmulator = initializeCanvasEmulator(canvas)
 
 	// End of Sizing Code
 	// ===========
